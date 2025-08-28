@@ -1,0 +1,46 @@
+name: GovSys CI
+
+on:
+    workflow_call:
+        inputs:
+            environment:
+                required: true
+                type: string
+
+    push:
+        branches:
+            - main
+            - dev
+            - "feature/**"
+            - "bugfix/**"
+            - "hotfix/**"
+    pull_request:
+        branches:
+            - dev
+            - main
+
+jobs:
+    run-tests:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.4
+                  extensions: mbstring, bcmath
+                  tools: composer
+
+            - name: Install Composer dependencies
+              run: composer install --prefer-dist --no-progress --no-interaction
+
+            - name: Create Database
+              run: |
+                  mkdir -p database
+                  touch database/database.sqlite
+
+            - name: Run PHPUnit tests
+              run: vendor/bin/phpunit
