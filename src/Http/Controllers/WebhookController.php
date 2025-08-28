@@ -11,12 +11,12 @@ class WebhookController
 {
     public function __invoke(Request $request)
     {
-        if (! empty(config('chapa.secret_key'))) {
+        if (! is_null(config('chapa.webhook_secret'))) {
             $secret = config('chapa.webhook_secret');
 
             $hash = hash_hmac('sha256', $request->getContent(), $secret);
 
-            if (! hash_equals($hash, $request->header('Chapa-Signature'))) {
+            if (! hash_equals($hash, $request->header('x-chapa-signature'))) {
                 return response()->json(['message' => 'Invalid signature'], 403);
             }
         }
