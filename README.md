@@ -97,7 +97,7 @@ Chapa sends webhooks for all payment-related events to your application. This pa
 To customize webhook handling, create your own controller and update the route in your application as needed.
 
 Default route for receiving webhook is:
-`https://your-app-domain.com/vp/chapa/webhook`
+`/vp/chapa/webhook`
 
 You can change the route by changing the `CHAPA_CALLBACK_URL` env variable.
 
