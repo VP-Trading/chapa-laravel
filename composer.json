@@ -2,7 +2,6 @@
     "name": "vp-trading/chapa-laravel",
     "type": "library",
     "license": "MIT",
-    "version": "1.0.0",
     "keywords": [
         "Laravel",
         "Chapa",
