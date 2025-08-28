@@ -42,5 +42,5 @@ jobs:
                   mkdir -p database
                   touch database/database.sqlite
 
-            - name: Run PHPUnit tests
-              run: vendor/bin/phpunit
+            - name: Run Pest tests
+              run: vendor/bin/pest
