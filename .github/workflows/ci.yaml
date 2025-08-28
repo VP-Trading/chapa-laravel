@@ -1,4 +1,4 @@
-name: GovSys CI
+name: Chapa-Laravel CI
 
 on:
     workflow_call:
@@ -43,4 +43,4 @@ jobs:
                   touch database/database.sqlite
 
             - name: Run Pest tests
-              run: vendor/bin/pest --do-not-cache-result
+              run: ./vendor/bin/pest --do-not-cache-result
