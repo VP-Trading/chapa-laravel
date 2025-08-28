@@ -23,6 +23,13 @@ class WebhookController
 
         $content = json_decode($request->getContent(), true);
 
+        if (ChapaWebhookEvent::where('tx_ref', $content['tx_ref'])
+            ->where('event_type', $content['event'])
+            ->exists()
+        ) {
+            return response()->json(['message' => 'Duplicate webhook'], 200);
+        }
+
         ChapaWebhookEvent::create([
             'event_type' => $content['event'],
             'tx_ref' => $content['tx_ref'] ?? null,

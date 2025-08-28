@@ -45,7 +45,7 @@ class ChapaClient
                 'phone_number' => $user->getPhoneNumber(),
                 'return_url' => $returnUrl,
                 'callback_url' => route('chapa.webhook'),
-                'tx_ref' => config('chapa.ref_prefix') . str()->random(10),
+                'tx_ref' => config('chapa.ref_prefix').str()->random(10),
             ]);
 
         return $response->json();
