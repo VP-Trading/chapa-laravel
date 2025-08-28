@@ -52,4 +52,15 @@ class ChapaClient
 
         return $response->json();
     }
+
+    public function refund($tx_ref, ?Money $amount = null, ?string $reason = null): array
+    {
+        $response = Http::withToken($this->secretKey)
+            ->post("{$this->baseUrl}/refund/$tx_ref", [
+                'amount' => $amount ? $amount->getAmount() : null,
+                'reason' => $reason,
+            ]);
+
+        return $response->json();
+    }
 }
