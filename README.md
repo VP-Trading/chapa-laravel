@@ -44,13 +44,13 @@ Here are some basic usage examples:
 use Vptrading\ChapaLaravel\Facades\Chapa;
 
 $response = Chapa::acceptPayment([
-    'amount' => 100,
-    'currency' => 'ETB',
-    'email' => 'customer@example.com',
-    'first_name' => 'John',
-    'last_name' => 'Doe',
-    'tx_ref' => 'unique-tx-ref-123',
-    'callback_url' => route('chapa.callback'),
+    Money::ETB(100),
+    new UserValueObject(
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'johndoe@example.com',
+        phoneNumber: '0912345678'
+    )
 ]);
 
 // Redirect user to payment page
