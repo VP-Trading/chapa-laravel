@@ -25,10 +25,12 @@ To install the `chapa-laravel` package, follow these steps:
     ```
 
 4. **Configure your `.env` file:**
-   Add your Chapa API key:
+   Add your Chapa API keys:
 
     ```bash
-    CHAPA_API_KEY=your_chapa_api_key_here
+    CHAPA_SECRET_KEY=your_chapa_secret_key_here
+    CHAPA_WEBHOOK_ENDPOINT=vp/chapa/webhook
+    CHAPA_REF_PREFIX=vp_chapa_
     ```
 
 5. **Ready to use!**
@@ -69,5 +71,7 @@ if ($verification['status'] === 'success') {
     // Payment was successful
 }
 ```
+
+> **Note:** This package is still under development.
 
 **_🚀 And that's it. Do your thing and Give us a star if this helped you.🚀_**
