@@ -1,4 +1,6 @@
-# Installation
+# Chapa Laravel Package
+
+## Installation
 
 To install the `chapa-laravel` package, follow these steps:
 
@@ -8,7 +10,7 @@ To install the `chapa-laravel` package, follow these steps:
     composer require vp-trading/chapa-laravel
     ```
 
-2. **Publish the configuration, route, and migration files (optional):**
+2. **Publish the configuration, route, and migration files:**
 
     ```bash
     php artisan vendor:publish --provider="Vptrading\ChapaLaravel\ChapaServiceProvider"
@@ -16,21 +18,27 @@ To install the `chapa-laravel` package, follow these steps:
 
     The package comes with config, route, and migration files to help you get started quickly.
 
-3. **Configure your `.env` file:**
+3. **Run the migration:**
+
+    ```bash
+    php artisan migrate
+    ```
+
+4. **Configure your `.env` file:**
    Add your Chapa API key:
 
     ```bash
     CHAPA_API_KEY=your_chapa_api_key_here
     ```
 
-4. **Ready to use!**
+5. **Ready to use!**
    You can now use the package in your Laravel application.
 
-# Usage
+## Usage
 
 Here are some basic usage examples:
 
-## Initialize Payment
+### Initialize Payment
 
 ```php
 use Vptrading\ChapaLaravel\Facades\Chapa;
@@ -49,7 +57,7 @@ $response = Chapa::acceptPayment([
 return redirect($response['data']['checkout_url']);
 ```
 
-## Verify Payment
+### Verify Payment
 
 ```php
 use Vptrading\ChapaLaravel\Facades\Chapa;
@@ -61,3 +69,5 @@ if ($verification['status'] === 'success') {
     // Payment was successful
 }
 ```
+
+**_🚀 And that's it. Do your thing and Give us a star if this helped you.🚀_**
