@@ -5,7 +5,7 @@ To install the `chapa-laravel` package, follow these steps:
 1. **Require the package via Composer:**
 
     ```bash
-    composer require alemcinema/chapa-laravel
+    composer require vp-trading/chapa-laravel
     ```
 
 2. **Publish the configuration, route, and migration files (optional):**
