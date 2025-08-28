@@ -45,6 +45,7 @@ Here are some basic usage examples:
 ```php
 use Vptrading\ChapaLaravel\Facades\Chapa;
 use VpTrading\ChapaLaravel\ValueObjects\UserValueObject;
+use Money\Money;
 
 $response = Chapa::acceptPayment([
     Money::ETB(100),
@@ -53,7 +54,8 @@ $response = Chapa::acceptPayment([
         lastName: 'Doe',
         email: 'johndoe@example.com',
         phoneNumber: '0912345678'
-    )
+    ),
+    route('return-url')
 ]);
 
 // Redirect user to payment page
