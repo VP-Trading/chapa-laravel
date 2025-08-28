@@ -44,8 +44,8 @@ class ChapaClient
                 'email' => $user->getEmail(),
                 'phone_number' => $user->getPhoneNumber(),
                 'return_url' => $returnUrl,
-                'callback_url' => config('chapa.callback_url'),
-                'tx_ref' => config('chapa.ref_prefix').str()->random(10),
+                'callback_url' => route('chapa.webhook'),
+                'tx_ref' => config('chapa.ref_prefix') . str()->random(10),
             ]);
 
         return $response->json();
