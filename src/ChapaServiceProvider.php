@@ -29,7 +29,6 @@ class ChapaServiceProvider extends ServiceProvider
 
     public function register()
     {
-        // dd(__DIR__ . '/../config/chapa.php');
         $this->mergeConfigFrom(__DIR__.'/../config/chapa.php', 'chapa');
 
         $this->app->singleton('chapa', fn ($app) => new ChapaClient);
