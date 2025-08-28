@@ -90,6 +90,29 @@ Chapa::refund($chapaRef, Money::ETB(10000), 'Client Requested Refund');
 
 The amount and reason in the refund method are **optional** and can.
 
+### Webhook
+
+Chapa sends webhooks for all payment-related events to your application. This package provides a default webhook controller to handle these events. You can extend or override the default controller `Vptrading\ChapaLaravel\Http\Controllers\WebhookController::class` to implement custom logic for different webhook events.
+
+To customize webhook handling, create your own controller and update the route in your application as needed.
+
+Default route for receiving webhook is:
+`https://your-app-domain.com/vp/chapa/webhook`
+
+You can change the route by changing the `CHAPA_CALLBACK_URL` env variable.
+
+```php
+class WebhookController extends ChapaWebhookController
+{
+    public function __invoke(Request $request)
+    {
+        parent::__invoke($request);
+
+        // Handle your custom logic here.
+    }
+}
+```
+
 > **Note:** This package is still under development.
 
 **_🚀 And that's it. Do your thing and Give us a star if this helped you.🚀_**
