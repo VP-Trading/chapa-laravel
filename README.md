@@ -29,7 +29,8 @@ To install the `chapa-laravel` package, follow these steps:
 
     ```bash
     CHAPA_SECRET_KEY=your_chapa_secret_key_here
-    CHAPA_WEBHOOK_ENDPOINT=vp/chapa/webhook
+    CHAPA_CALLBACK_URL=https://your-callback-url.com/vp/chapa/webhook
+    CHAPA_WEBHOOK_SECRET=54LZzhZbPs7yreuS6bAw74zS0KE7P4Mt1fiqRx7wOL8OdjUQHjBqsIpkpT2rm43S
     CHAPA_REF_PREFIX=vp_chapa_
     ```
 
