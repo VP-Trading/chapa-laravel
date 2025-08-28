@@ -106,7 +106,7 @@ it('can refund transactions', function (): void {
                         "id": 730,
                         "chapa_reference": "APezQ1KKswbb",
                         "bank_reference": "BLC9JI3G21",
-                        "amount": "1.00",
+                        "amount": "100.00",
                         "ref": "MERC-DIS-REF-s223VGvQFJk",
                         "currency": "ETB",
                         "status": "Refund Initiated",
@@ -122,7 +122,9 @@ it('can refund transactions', function (): void {
         );
     });
 
-    $response = Chapa::refund($tx_ref, Money::ETB(100), 'Customer requested refund');
+    $response = Chapa::refund($tx_ref, Money::ETB(10000), 'Customer requested refund');
 
     expect($response['status'])->toBe('success');
+    expect($response['data']['chapa_reference'])->toBeString();
+    expect($response['data']['amount'])->toBe('100.00');
 });
