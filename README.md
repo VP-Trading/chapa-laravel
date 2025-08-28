@@ -44,6 +44,7 @@ Here are some basic usage examples:
 
 ```php
 use Vptrading\ChapaLaravel\Facades\Chapa;
+use VpTrading\ChapaLaravel\ValueObjects\UserValueObject;
 
 $response = Chapa::acceptPayment([
     Money::ETB(100),
