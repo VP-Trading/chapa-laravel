@@ -39,6 +39,8 @@ To install the `chapa-laravel` package, follow these steps:
 
 ## Usage
 
+> Before you start using this package you should know all amount must be put in **_cent values_**. The development of this package took standards from stripe. So for example if you want the amount be 100 Birr you will put 10000.
+
 Here are some basic usage examples:
 
 ### Initialize Payment
@@ -49,7 +51,7 @@ use VpTrading\ChapaLaravel\ValueObjects\UserValueObject;
 use Money\Money;
 
 $response = Chapa::acceptPayment([
-    Money::ETB(100),
+    Money::ETB(10000),
     new UserValueObject(
         firstName: 'John',
         lastName: 'Doe',
@@ -75,6 +77,18 @@ if ($verification['status'] === 'success') {
     // Payment was successful
 }
 ```
+
+### Refund
+
+```php
+use Vptrading\ChapaLaravel\Facades\Chapa;
+use Money\Money;
+
+$chapaRef = "APfxLoHHsl1eD";
+Chapa::refund($chapaRef, Money::ETB(10000), 'Client Requested Refund');
+```
+
+The amount and reason in the refund method are **optional** and can.
 
 > **Note:** This package is still under development.
 

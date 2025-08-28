@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Vptrading\ChapaLaravel\Services;
 
 use Illuminate\Support\Facades\Http;
+use Money\Currencies\ISOCurrencies;
+use Money\Formatter\DecimalMoneyFormatter;
 use Money\Money;
 use Vptrading\ChapaLaravel\ValueObjects\UserValueObject;
 
@@ -29,11 +31,15 @@ class ChapaClient
         UserValueObject $user,
         string $returnUrl,
     ) {
+        $currencies = new ISOCurrencies;
+
+        $moneyFormatter = new DecimalMoneyFormatter($currencies);
+
         $response = Http::withToken($this->secretKey)
             ->post("{$this->baseUrl}/transaction/initialize", [
                 'first_name' => $user->getFirstName(),
                 'last_name' => $user->getLastName(),
-                'amount' => $amount->getAmount(),
+                'amount' => $moneyFormatter->format($amount),
                 'currency' => $amount->getCurrency()->getCode(),
                 'email' => $user->getEmail(),
                 'phone_number' => $user->getPhoneNumber(),
@@ -55,9 +61,12 @@ class ChapaClient
 
     public function refund($chapaRef, ?Money $amount = null, ?string $reason = null): array
     {
+        $currencies = new ISOCurrencies;
+
+        $moneyFormatter = new DecimalMoneyFormatter($currencies);
         $response = Http::withToken($this->secretKey)
             ->post("{$this->baseUrl}/refund/$chapaRef", [
-                'amount' => $amount ? $amount->getAmount() : null,
+                'amount' => $amount ? $moneyFormatter->format($amount) : null,
                 'reason' => $reason,
             ]);
 
