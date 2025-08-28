@@ -37,7 +37,7 @@ it('accepts payments', function (): void {
 it('throws invalid argument exception if secret key is not set', function (): void {
     config()->set('chapa.secret_key', null);
 
-    expect(fn() => Chapa::acceptPayment(
+    expect(fn () => Chapa::acceptPayment(
         Money::ETB(100),
         new UserValueObject(
             firstName: 'John',
@@ -51,7 +51,7 @@ it('throws invalid argument exception if secret key is not set', function (): vo
 
 it('verifies payments', function (): void {
     config()->set('chapa.secret_key', 'test_secret_key');
-    $tx_ref = 'vp_chapa_' . str()->random(10);
+    $tx_ref = 'vp_chapa_'.str()->random(10);
     Http::fake(function () use ($tx_ref) {
         return Http::response(
             json_decode(
@@ -70,7 +70,7 @@ it('verifies payments', function (): void {
                         "type": "API",
                         "status": "success",
                         "reference": "6jnheVKQEmy",
-                        "tx_ref": "' . $tx_ref . '",
+                        "tx_ref": "'.$tx_ref.'",
                         "customization": {
                             "title": "Payment for my favourite merchant",
                             "description": "I love online payments",
@@ -95,7 +95,7 @@ it('verifies payments', function (): void {
 
 it('can refund transactions', function (): void {
     config()->set('chapa.secret_key', 'test_secret_key');
-    $tx_ref = 'vp_chapa_' . str()->random(10);
+    $tx_ref = 'vp_chapa_'.str()->random(10);
     Http::fake(function () {
         return Http::response(
             json_decode(

@@ -26,6 +26,7 @@ class WebhookController
         ChapaWebhookEvent::create([
             'event_type' => $content['event'],
             'tx_ref' => $content['tx_ref'] ?? null,
+            'chapa_ref' => $content['reference'] ?? null,
             'status' => $content['status'],
             'amount' => $content['amount'],
             'charge' => $content['charge'],

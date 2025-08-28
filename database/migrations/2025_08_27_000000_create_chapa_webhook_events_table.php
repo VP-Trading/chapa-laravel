@@ -14,6 +14,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('event_type');
             $table->string('tx_ref')->nullable()->unique();
+            $table->string('chapa_ref')->nullable()->unique();
             $table->string('status')->default('pending');
             $table->string('type');
             $table->decimal('amount', 10, 2);
