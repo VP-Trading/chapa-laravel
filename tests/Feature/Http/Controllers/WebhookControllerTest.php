@@ -3,9 +3,8 @@
 declare(strict_types=1);
 
 it('can receive a webhook event', function (): void {
-
     $response = $this->postJson(
-        config('chapa.webhook_endpoint'),
+        route('chapa.webhook'),
         json_decode('{
                   "event": "charge.success",
                   "first_name": "John",
