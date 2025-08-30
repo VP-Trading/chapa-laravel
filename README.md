@@ -88,7 +88,7 @@ $chapaRef = "APfxLoHHsl1eD";
 Chapa::refund($chapaRef, Money::ETB(10000), 'Client Requested Refund');
 ```
 
-The amount and reason in the refund method are **optional** and can.
+The amount and reason in the refund method are **optional** and can be left null.
 
 ### Webhook
 
