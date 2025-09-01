@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Vptrading\ChapaLaravel\ValueObjects;
 
-final readonly class UserValueObject
+final readonly class User
 {
     public function __construct(
         public string $firstName,

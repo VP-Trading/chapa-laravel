@@ -8,7 +8,11 @@ use Illuminate\Support\Facades\Http;
 use Money\Currencies\ISOCurrencies;
 use Money\Formatter\DecimalMoneyFormatter;
 use Money\Money;
-use Vptrading\ChapaLaravel\ValueObjects\UserValueObject;
+use Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse;
+use Vptrading\ChapaLaravel\Dtos\RefundResponse;
+use Vptrading\ChapaLaravel\Dtos\VerifyPaymentResponse;
+use Vptrading\ChapaLaravel\ValueObjects\Customization;
+use Vptrading\ChapaLaravel\ValueObjects\User;
 
 class ChapaClient
 {
@@ -28,9 +32,10 @@ class ChapaClient
 
     public function acceptPayment(
         Money $amount,
-        UserValueObject $user,
+        User $user,
         string $returnUrl,
-    ) {
+        ?Customization $customization = null
+    ): AcceptPaymentResponse {
         $currencies = new ISOCurrencies;
 
         $moneyFormatter = new DecimalMoneyFormatter($currencies);
@@ -46,20 +51,29 @@ class ChapaClient
                 'return_url' => $returnUrl,
                 'callback_url' => route('chapa.webhook'),
                 'tx_ref' => config('chapa.ref_prefix').str()->random(10),
+                'customization' => $customization?->toArray(),
             ]);
 
-        return $response->json();
+        return new AcceptPaymentResponse(
+            checkout_url: $response->json('data.checkout_url'),
+            status: $response->json('status'),
+            message: $response->json('message')
+        );
     }
 
-    public function verifyPayment(string $transactionId)
+    public function verifyPayment(string $transactionId): VerifyPaymentResponse
     {
         $response = Http::withToken($this->secretKey)
             ->get("{$this->baseUrl}/transaction/verify/{$transactionId}");
 
-        return $response->json();
+        return new VerifyPaymentResponse(
+            data: $response->json('data'),
+            status: $response->json('status'),
+            message: $response->json('message')
+        );
     }
 
-    public function refund($chapaRef, ?Money $amount = null, ?string $reason = null): array
+    public function refund($chapaRef, ?Money $amount = null, ?string $reason = null): RefundResponse
     {
         $currencies = new ISOCurrencies;
 
@@ -70,6 +84,10 @@ class ChapaClient
                 'reason' => $reason,
             ]);
 
-        return $response->json();
+        return new RefundResponse(
+            status: $response->json('status'),
+            message: $response->json('message'),
+            data: $response->json('data')
+        );
     }
 }
