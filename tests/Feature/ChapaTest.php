@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Http;
 use Money\Money;
 use Vptrading\ChapaLaravel\Facades\Chapa;
-use Vptrading\ChapaLaravel\ValueObjects\UserValueObject;
+use Vptrading\ChapaLaravel\ValueObjects\User;
 
 it('accepts payments', function (): void {
     config()->set('chapa.secret_key', 'test_secret_key');
@@ -19,9 +19,10 @@ it('accepts payments', function (): void {
         );
     });
 
+    /** @var \Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse $response */
     $response = Chapa::acceptPayment(
         Money::ETB(100),
-        new UserValueObject(
+        new User(
             firstName: 'John',
             lastName: 'Doe',
             email: 'john.doe@example.com',
@@ -30,8 +31,36 @@ it('accepts payments', function (): void {
         'https://example.com/return'
     );
 
-    expect($response['status'])->toBe('success');
-    expect($response['data']['checkout_url'])->toBeString();
+    expect($response->status)->toBe('success');
+    expect($response->checkout_url)->toBeString();
+});
+
+it('accepts payments with customization', function (): void {
+    config()->set('chapa.secret_key', 'test_secret_key');
+    Http::fake(function () {
+        return Http::response(
+            json_decode(
+                '{"message": "Hosted Link", "status": "success", "data": {"checkout_url": "https://checkout.chapa.co/checkout/payment/V38JyhpTygC9QimkJrdful9oEjih0heIv53eJ1MsJS6xG"}}',
+                true
+            ),
+            200
+        );
+    });
+
+    /** @var \Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse $response */
+    $response = Chapa::acceptPayment(
+        Money::ETB(100),
+        new User(
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john.doe@example.com',
+            phoneNumber: '1234567890'
+        ),
+        'https://example.com/return'
+    );
+
+    expect($response->status)->toBe('success');
+    expect($response->checkout_url)->toBeString();
 });
 
 it('throws invalid argument exception if secret key is not set', function (): void {
@@ -39,7 +68,7 @@ it('throws invalid argument exception if secret key is not set', function (): vo
 
     expect(fn () => Chapa::acceptPayment(
         Money::ETB(100),
-        new UserValueObject(
+        new User(
             firstName: 'John',
             lastName: 'Doe',
             email: 'john.doe@example.com',
@@ -87,10 +116,11 @@ it('verifies payments', function (): void {
         );
     });
 
+    /** @var \Vptrading\ChapaLaravel\Dtos\VerifyPaymentResponse $response */
     $response = Chapa::verifyPayment($tx_ref);
 
-    expect($response['status'])->toBe('success');
-    expect($response['data']['tx_ref'])->toBe($tx_ref);
+    expect($response->status)->toBe('success');
+    expect($response->data['tx_ref'])->toBe($tx_ref);
 });
 
 it('can refund transactions', function (): void {
@@ -122,9 +152,10 @@ it('can refund transactions', function (): void {
         );
     });
 
+    /** @var \Vptrading\ChapaLaravel\Dtos\RefundResponse $response */
     $response = Chapa::refund($tx_ref, Money::ETB(10000), 'Customer requested refund');
 
-    expect($response['status'])->toBe('success');
-    expect($response['data']['chapa_reference'])->toBeString();
-    expect($response['data']['amount'])->toBe('100.00');
+    expect($response->status)->toBe('success');
+    expect($response->data['chapa_reference'])->toBeString();
+    expect($response->data['amount'])->toBe('100.00');
 });
