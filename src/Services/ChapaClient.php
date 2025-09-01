@@ -11,6 +11,7 @@ use Money\Money;
 use Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse;
 use Vptrading\ChapaLaravel\Dtos\RefundResponse;
 use Vptrading\ChapaLaravel\Dtos\VerifyPaymentResponse;
+use Vptrading\ChapaLaravel\Factories\AcceptPaymentResponseFactory;
 use Vptrading\ChapaLaravel\ValueObjects\Customization;
 use Vptrading\ChapaLaravel\ValueObjects\User;
 
@@ -54,11 +55,7 @@ class ChapaClient
                 'customization' => $customization?->toArray(),
             ]);
 
-        return new AcceptPaymentResponse(
-            checkout_url: $response->json('data.checkout_url'),
-            status: $response->json('status'),
-            message: $response->json('message')
-        );
+        return AcceptPaymentResponseFactory::fromApiResponse($response->json());
     }
 
     public function verifyPayment(string $transactionId): VerifyPaymentResponse

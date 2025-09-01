@@ -9,7 +9,8 @@ final readonly class AcceptPaymentResponse
     public function __construct(
         public ?string $checkout_url,
         public string $status,
-        public string $message
+        public ?string $message = null,
+        public array $validation_errors = []
     ) {
         //
     }
