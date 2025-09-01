@@ -10,7 +10,7 @@ final readonly class Customization implements Arrayable
 {
     public function __construct(
         public string $title,
-        public string $description,
+        public ?string $description = null,
         public ?string $logo = null
     ) {}
 
