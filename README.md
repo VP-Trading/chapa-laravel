@@ -47,22 +47,30 @@ Here are some basic usage examples:
 
 ```php
 use Vptrading\ChapaLaravel\Facades\Chapa;
-use VpTrading\ChapaLaravel\ValueObjects\UserValueObject;
+use VpTrading\ChapaLaravel\ValueObjects\User;
+use VpTrading\ChapaLaravel\ValueObjects\Customization;
 use Money\Money;
 
 $response = Chapa::acceptPayment([
     Money::ETB(10000),
-    new UserValueObject(
+    new User(
         firstName: 'John',
         lastName: 'Doe',
         email: 'johndoe@example.com',
         phoneNumber: '0912345678'
     ),
-    route('return-url')
+    route('return-url'),
+    new Customization(
+        title: 'VP Solutions',
+        description: 'This package is working like a charm.',
+        logo: 'https://vptrading.et/wp-content/uploads/2023/08/cropped-VP-Logo-Symbol-White.png'
+    )
 ]);
 
+The Customization in the acceptPayment() method is **optional** and can be left out.
+
 // Redirect user to payment page
-return redirect($response['data']['checkout_url']);
+return redirect($response->checkout_url);
 ```
 
 ### Verify Payment
@@ -73,7 +81,7 @@ use Vptrading\ChapaLaravel\Facades\Chapa;
 $tx_ref = 'unique-tx-ref-123';
 $verification = Chapa::verify($tx_ref);
 
-if ($verification['status'] === 'success') {
+if ($verification->data['status'] === 'success') {
     // Payment was successful
 }
 ```
