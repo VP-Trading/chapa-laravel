@@ -1,5 +1,7 @@
 # Chapa Laravel Package
 
+> **Note:** This package is still under development and may have breaking changes.
+
 ## Installation
 
 To install the `chapa-laravel` package, follow these steps:
@@ -120,7 +122,5 @@ class WebhookController extends ChapaWebhookController
     }
 }
 ```
-
-> **Note:** This package is still under development.
 
 **_🚀 And that's it. Do your thing and Give us a star if this helped you.🚀_**
