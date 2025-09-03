@@ -8,7 +8,7 @@ use Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse;
 
 class AcceptPaymentResponseFactory
 {
-    public static function fromApiResponse(array $response): AcceptPaymentResponse
+    public static function fromApiResponse(array $response, string $transactionId): AcceptPaymentResponse
     {
         if (array_key_exists('message', $response)) {
             if (is_string($response['message'])) {
@@ -22,6 +22,7 @@ class AcceptPaymentResponseFactory
             checkout_url: $response['data']['checkout_url'] ?? null,
             status: $response['status'] ?? 'unknown',
             message: $message ?? null,
+            transaction_id: $transactionId,
             validation_errors: $validationErrors ?? []
         );
     }

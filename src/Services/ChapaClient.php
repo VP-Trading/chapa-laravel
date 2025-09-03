@@ -41,6 +41,8 @@ class ChapaClient
 
         $moneyFormatter = new DecimalMoneyFormatter($currencies);
 
+        $txRef = config('chapa.ref_prefix').str()->random(10);
+
         $response = Http::withToken($this->secretKey)
             ->post("{$this->baseUrl}/transaction/initialize", [
                 'first_name' => $user->getFirstName(),
@@ -51,11 +53,11 @@ class ChapaClient
                 'phone_number' => $user->getPhoneNumber(),
                 'return_url' => $returnUrl,
                 'callback_url' => route('chapa.webhook'),
-                'tx_ref' => config('chapa.ref_prefix').str()->random(10),
+                'tx_ref' => $txRef,
                 'customization' => $customization?->toArray(),
             ]);
 
-        return AcceptPaymentResponseFactory::fromApiResponse($response->json());
+        return AcceptPaymentResponseFactory::fromApiResponse($response->json(), $txRef);
     }
 
     public function verifyPayment(string $transactionId): VerifyPaymentResponse

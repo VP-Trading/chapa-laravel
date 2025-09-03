@@ -33,6 +33,7 @@ it('accepts payments', function (): void {
 
     expect($response->status)->toBe('success');
     expect($response->checkout_url)->toBeString();
+    expect($response->transaction_id)->toBeString();
 });
 
 it('accepts payments with customization', function (): void {
@@ -61,6 +62,7 @@ it('accepts payments with customization', function (): void {
 
     expect($response->status)->toBe('success');
     expect($response->checkout_url)->toBeString();
+    expect($response->transaction_id)->toBeString();
 });
 
 it('throws invalid argument exception if secret key is not set', function (): void {
