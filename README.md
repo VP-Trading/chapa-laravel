@@ -4,7 +4,6 @@
 [![Latest Stable Version](https://poser.pugx.org/vp-trading/chapa-laravel/v/stable.svg)](https://packagist.org/packages/vp-trading/chapa-laravel)
 [![License](https://poser.pugx.org/vp-trading/chapa-laravel/license.svg)](https://packagist.org/packages/vp-trading/chapa-laravel)
 
-> **Note:** This package is still under development and may have breaking changes.
 
 ## Installation
 
