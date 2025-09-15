@@ -72,11 +72,11 @@ $response = Chapa::acceptPayment([
     )
 ]);
 
-The Customization in the acceptPayment() method is **optional** and can be left out.
-
 // Redirect user to payment page
 return redirect($response->checkout_url);
 ```
+
+The Customization in the acceptPayment() method is **optional** and can be left out.
 
 ### Verify Payment
 
