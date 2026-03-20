@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use Illuminate\Support\Facades\Http;
 use Money\Money;
+use Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse;
+use Vptrading\ChapaLaravel\Dtos\RefundResponse;
+use Vptrading\ChapaLaravel\Dtos\VerifyPaymentResponse;
 use Vptrading\ChapaLaravel\Facades\Chapa;
 use Vptrading\ChapaLaravel\ValueObjects\User;
 
@@ -19,7 +22,7 @@ it('accepts payments', function (): void {
         );
     });
 
-    /** @var \Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse $response */
+    /** @var AcceptPaymentResponse $response */
     $response = Chapa::acceptPayment(
         Money::ETB(100),
         new User(
@@ -48,7 +51,7 @@ it('accepts payments with customization', function (): void {
         );
     });
 
-    /** @var \Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse $response */
+    /** @var AcceptPaymentResponse $response */
     $response = Chapa::acceptPayment(
         Money::ETB(100),
         new User(
@@ -77,7 +80,7 @@ it('throws invalid argument exception if secret key is not set', function (): vo
             phoneNumber: '1234567890'
         ),
         'https://example.com/return'
-    ))->toThrow(\InvalidArgumentException::class);
+    ))->toThrow(InvalidArgumentException::class);
 });
 
 it('verifies payments', function (): void {
@@ -118,7 +121,7 @@ it('verifies payments', function (): void {
         );
     });
 
-    /** @var \Vptrading\ChapaLaravel\Dtos\VerifyPaymentResponse $response */
+    /** @var VerifyPaymentResponse $response */
     $response = Chapa::verifyPayment($tx_ref);
 
     expect($response->status)->toBe('success');
@@ -154,7 +157,7 @@ it('can refund transactions', function (): void {
         );
     });
 
-    /** @var \Vptrading\ChapaLaravel\Dtos\RefundResponse $response */
+    /** @var RefundResponse $response */
     $response = Chapa::refund($tx_ref, Money::ETB(10000), 'Customer requested refund');
 
     expect($response->status)->toBe('success');

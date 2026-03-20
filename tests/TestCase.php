@@ -10,6 +10,7 @@ use Orchestra\Testbench\Attributes\WithConfig;
 use Orchestra\Testbench\Attributes\WithEnv;
 use Orchestra\Testbench\Attributes\WithMigration;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Vptrading\ChapaLaravel\ChapaServiceProvider;
 
 // #[WithEnv('DB_CONNECTION', 'testing')]
 // #[WithConfig('database.default', 'testing')]
@@ -20,7 +21,7 @@ abstract class TestCase extends OrchestraTestCase
     protected function getPackageProviders($app)
     {
         return [
-            \Vptrading\ChapaLaravel\ChapaServiceProvider::class,
+            ChapaServiceProvider::class,
         ];
     }
 
