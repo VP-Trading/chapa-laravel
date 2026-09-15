@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Money\Money;
 use Vptrading\ChapaLaravel\Dtos\AcceptPaymentResponse;
@@ -163,4 +164,120 @@ it('can refund transactions', function (): void {
     expect($response->status)->toBe('success');
     expect($response->data['chapa_reference'])->toBeString();
     expect($response->data['amount'])->toBe('100.00');
+});
+
+it('initializes a hosted payment using api v2', function (): void {
+    config()->set('chapa.secret_key', 'test_secret_key');
+    config()->set('chapa.api_version', 'v2');
+    Http::fake([
+        '*' => Http::response([
+            'status' => 'success',
+            'message' => 'Payment initialized successfully',
+            'data' => ['checkout_url' => 'https://checkout.chapa.global/payment/CHAPA123'],
+        ]),
+    ]);
+
+    $response = Chapa::acceptPayment(
+        Money::ETB(10000),
+        new User('John', 'Doe', 'john.doe@example.com', '+251911111111'),
+        'https://example.com/return'
+    );
+
+    expect($response->status)->toBe('success')
+        ->and($response->transaction_id)->toStartWith('vp_chapa_');
+
+    Http::assertSent(function (Request $request): bool {
+        $data = $request->data();
+
+        return $request->url() === 'https://api.chapa.global/v2/payments/hosted'
+            && $request->hasHeader('Authorization', 'Bearer test_secret_key')
+            && $data['amount'] === '100.00'
+            && $data['currency'] === 'ETB'
+            && str_starts_with($data['merchant_reference'], 'vp_chapa_')
+            && $data['customer'] === [
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'email' => 'john.doe@example.com',
+                'phone_number' => '+251911111111',
+            ]
+            && ! array_key_exists('return_url', $data)
+            && ! array_key_exists('callback_url', $data)
+            && ! array_key_exists('customization', $data);
+    });
+});
+
+it('maps api v2 hosted payment errors to the existing response', function (): void {
+    config()->set('chapa.secret_key', 'test_secret_key');
+    config()->set('chapa.api_version', 'v2');
+    Http::fake([
+        '*' => Http::response([
+            'status' => 'error',
+            'message' => 'Invalid request',
+            'error' => [
+                'code' => 'INVALID_VALUE',
+                'details' => ['amount' => ['The amount must be positive.']],
+            ],
+        ], 422),
+    ]);
+
+    $response = Chapa::acceptPayment(
+        Money::ETB(10000),
+        new User('John', 'Doe', 'john.doe@example.com', '+251911111111'),
+        'https://example.com/return'
+    );
+
+    expect($response->status)->toBe('error')
+        ->and($response->message)->toBe('Invalid request')
+        ->and($response->checkout_url)->toBeNull()
+        ->and($response->validation_errors)->toBe([
+            'amount' => ['The amount must be positive.'],
+        ]);
+});
+
+it('verifies a payment using api v2', function (): void {
+    config()->set('chapa.secret_key', 'test_secret_key');
+    config()->set('chapa.api_version', 'v2');
+    Http::fake([
+        '*' => Http::response([
+            'status' => 'success',
+            'message' => 'Payment retrieved successful',
+            'data' => ['chapa_reference' => 'CHAPA123', 'status' => 'success'],
+        ]),
+    ]);
+
+    $response = Chapa::verifyPayment('CHAPA123');
+
+    expect($response->data['chapa_reference'])->toBe('CHAPA123');
+    Http::assertSent(fn (Request $request): bool => $request->url() === 'https://api.chapa.global/v2/payments/CHAPA123/verify');
+});
+
+it('creates full and partial refunds using api v2', function (?Money $amount, array $expected): void {
+    config()->set('chapa.secret_key', 'test_secret_key');
+    config()->set('chapa.api_version', 'v2');
+    Http::fake([
+        '*' => Http::response([
+            'status' => 'success',
+            'message' => 'Refund processed successfully',
+            'data' => ['chapa_reference' => 'RFND123'],
+        ]),
+    ]);
+
+    Chapa::refund('CHAPA123', $amount, $amount ? 'Customer request' : null);
+
+    Http::assertSent(fn (Request $request): bool => $request->url() === 'https://api.chapa.global/v2/refunds'
+        && $request->data() === $expected);
+})->with([
+    'full refund' => [null, ['payment_reference' => 'CHAPA123']],
+    'partial refund' => [Money::ETB(10000), [
+        'payment_reference' => 'CHAPA123',
+        'amount' => '100.00',
+        'reason' => 'Customer request',
+    ]],
+]);
+
+it('rejects unsupported api versions', function (): void {
+    config()->set('chapa.secret_key', 'test_secret_key');
+    config()->set('chapa.api_version', 'v3');
+
+    expect(fn () => app('chapa'))->toThrow(InvalidArgumentException::class, 'Unsupported Chapa API version');
 });
