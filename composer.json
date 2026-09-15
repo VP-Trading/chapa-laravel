@@ -60,7 +60,7 @@
         "lint": "pint",
         "analyze": "phpstan",
         "test:lint": "pint --test",
-        "test:refactor": "rector --only-suffix=Test.php",
+        "test:refactor": "rector --filter=Test.php",
         "test": [
             "@lint",
             "@refactor",
