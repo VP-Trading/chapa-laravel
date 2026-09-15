@@ -34,6 +34,7 @@ To install the `chapa-laravel` package, follow these steps:
 
     ```bash
     CHAPA_SECRET_KEY=your_chapa_secret_key_here
+    CHAPA_API_VERSION=v1
     CHAPA_CALLBACK_URL=/vp/chapa/webhook
     CHAPA_WEBHOOK_SECRET=54LZzhZbPs7yreuS6bAw74zS0KE7P4Mt1fiqRx7wOL8OdjUQHjBqsIpkpT2rm43S
     CHAPA_REF_PREFIX=vp_chapa_
@@ -77,6 +78,26 @@ return redirect($response->checkout_url);
 ```
 
 The Customization in the acceptPayment() method is **optional** and can be left out.
+
+## Chapa API v2
+
+API v1 remains the default so existing applications continue to work without changes. To opt in to API v2, add:
+
+```bash
+CHAPA_API_VERSION=v2
+```
+
+The v2 API uses `https://api.chapa.global/v2` by default. You can override it with `CHAPA_V2_BASE_URL` when needed.
+
+The existing `acceptPayment()`, `verifyPayment()`, and `refund()` PHP interfaces remain unchanged. Under v2:
+
+- Hosted payments use the nested `customer` payload and a generated `merchant_reference`.
+- `AcceptPaymentResponse::$transaction_id` continues to contain that generated merchant reference.
+- `verifyPayment()` expects the Chapa payment reference returned by Chapa through verification or a webhook.
+- `refund()` expects the successful payment's Chapa reference.
+- The legacy `returnUrl` and `Customization` arguments are retained for source compatibility but are not sent by the v2 hosted-payment API. Configure redirect and checkout presentation using the options supported by your Chapa v2 dashboard.
+
+During migration, the included webhook endpoint accepts both v1 and v2 payload formats. When `CHAPA_WEBHOOK_SECRET` is configured, both formats require a valid `x-chapa-signature` generated from the exact raw request body.
 
 ### Verify Payment
 

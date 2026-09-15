@@ -18,6 +18,12 @@ class AcceptPaymentResponseFactory
             }
         }
 
+        if (isset($response['error']['details'])) {
+            $validationErrors = is_array($response['error']['details'])
+                ? $response['error']['details']
+                : ['error' => $response['error']['details']];
+        }
+
         return new AcceptPaymentResponse(
             checkout_url: $response['data']['checkout_url'] ?? null,
             status: $response['status'] ?? 'unknown',

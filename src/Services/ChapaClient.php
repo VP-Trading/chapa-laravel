@@ -17,9 +17,11 @@ use Vptrading\ChapaLaravel\ValueObjects\User;
 
 class ChapaClient
 {
-    protected $baseUrl;
+    protected string $baseUrl;
 
-    protected $secretKey;
+    protected string $secretKey;
+
+    protected string $apiVersion;
 
     public function __construct()
     {
@@ -27,8 +29,15 @@ class ChapaClient
             throw new \InvalidArgumentException('Chapa secret key is not set.');
         }
 
-        $this->baseUrl = config('chapa.base_url');
-        $this->secretKey = config('chapa.secret_key');
+        $apiVersion = (string) config('chapa.api_version', 'v1');
+
+        if (! in_array($apiVersion, ['v1', 'v2'], true)) {
+            throw new \InvalidArgumentException("Unsupported Chapa API version [{$apiVersion}]. Expected [v1] or [v2].");
+        }
+
+        $this->apiVersion = $apiVersion;
+        $this->baseUrl = (string) config($apiVersion === 'v2' ? 'chapa.v2_base_url' : 'chapa.base_url');
+        $this->secretKey = (string) config('chapa.secret_key');
     }
 
     public function acceptPayment(
@@ -43,8 +52,19 @@ class ChapaClient
 
         $txRef = config('chapa.ref_prefix').str()->random(10);
 
-        $response = Http::withToken($this->secretKey)
-            ->post("{$this->baseUrl}/transaction/initialize", [
+        $payload = $this->apiVersion === 'v2'
+            ? [
+                'amount' => $moneyFormatter->format($amount),
+                'currency' => $amount->getCurrency()->getCode(),
+                'merchant_reference' => $txRef,
+                'customer' => [
+                    'first_name' => $user->getFirstName(),
+                    'last_name' => $user->getLastName(),
+                    'email' => $user->getEmail(),
+                    'phone_number' => $user->getPhoneNumber(),
+                ],
+            ]
+            : [
                 'first_name' => $user->getFirstName(),
                 'last_name' => $user->getLastName(),
                 'amount' => $moneyFormatter->format($amount),
@@ -55,15 +75,22 @@ class ChapaClient
                 'callback_url' => route('chapa.webhook'),
                 'tx_ref' => $txRef,
                 'customization' => $customization?->toArray(),
-            ]);
+            ];
+
+        $endpoint = $this->apiVersion === 'v2' ? 'payments/hosted' : 'transaction/initialize';
+        $response = Http::withToken($this->secretKey)
+            ->post("{$this->baseUrl}/{$endpoint}", $payload);
 
         return AcceptPaymentResponseFactory::fromApiResponse($response->json(), $txRef);
     }
 
     public function verifyPayment(string $transactionId): VerifyPaymentResponse
     {
+        $endpoint = $this->apiVersion === 'v2'
+            ? "payments/{$transactionId}/verify"
+            : "transaction/verify/{$transactionId}";
         $response = Http::withToken($this->secretKey)
-            ->get("{$this->baseUrl}/transaction/verify/{$transactionId}");
+            ->get("{$this->baseUrl}/{$endpoint}");
 
         return new VerifyPaymentResponse(
             data: $response->json('data'),
@@ -77,11 +104,20 @@ class ChapaClient
         $currencies = new ISOCurrencies;
 
         $moneyFormatter = new DecimalMoneyFormatter($currencies);
-        $response = Http::withToken($this->secretKey)
-            ->post("{$this->baseUrl}/refund/$chapaRef", [
+        $payload = $this->apiVersion === 'v2'
+            ? array_filter([
+                'payment_reference' => $chapaRef,
                 'amount' => $amount ? $moneyFormatter->format($amount) : null,
                 'reason' => $reason,
-            ]);
+            ], fn (mixed $value): bool => $value !== null)
+            : [
+                'amount' => $amount ? $moneyFormatter->format($amount) : null,
+                'reason' => $reason,
+            ];
+
+        $endpoint = $this->apiVersion === 'v2' ? 'refunds' : "refund/{$chapaRef}";
+        $response = Http::withToken($this->secretKey)
+            ->post("{$this->baseUrl}/{$endpoint}", $payload);
 
         return new RefundResponse(
             status: $response->json('status'),

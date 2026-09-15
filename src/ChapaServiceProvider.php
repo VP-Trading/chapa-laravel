@@ -15,7 +15,7 @@ class ChapaServiceProvider extends ServiceProvider
     {
         Model::unguard();
         AboutCommand::add('Chapa', fn () => [
-            'Version' => '1.0.0',
+            'Version' => '1.4.0',
         ]);
         $this->publishes([
             __DIR__.'/../config/chapa.php' => config_path('chapa.php'),
