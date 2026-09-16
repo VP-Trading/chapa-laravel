@@ -54,7 +54,7 @@ class ChapaClient
 
         $payload = $this->apiVersion === 'v2'
             ? [
-                'amount' => $moneyFormatter->format($amount),
+                'amount' => (int) $amount->getAmount(),
                 'currency' => $amount->getCurrency()->getCode(),
                 'merchant_reference' => $txRef,
                 'customer' => [
