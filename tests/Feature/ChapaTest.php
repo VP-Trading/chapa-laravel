@@ -191,7 +191,7 @@ it('initializes a hosted payment using api v2', function (): void {
 
         return $request->url() === 'https://api.chapa.global/v2/payments/hosted'
             && $request->hasHeader('Authorization', 'Bearer test_secret_key')
-            && $data['amount'] === '100.00'
+            && $data['amount'] === 10000
             && $data['currency'] === 'ETB'
             && str_starts_with($data['merchant_reference'], 'vp_chapa_')
             && $data['customer'] === [
